@@ -217,6 +217,14 @@
     <string>Check whether all the files associated with images in the local Database are available on the disk.</string>
    </property>
   </action>
+  <action name="ActionRaydose">
+   <property name="text">
+    <string>Export to Raydose</string>
+   </property>
+   <property name="toolTip">
+    <string>Export to Raydose for Calculation</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

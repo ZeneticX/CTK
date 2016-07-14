@@ -423,7 +423,7 @@ ctkDICOMTableManager* ctkDICOMBrowser::dicomTableManager()
 //----------------------------------------------------------------------------
 void ctkDICOMBrowser::onFileIndexed(const QString& filePath)
 {
-  // Update the progress dialog when the file name changes
+  // Update the progress dialog when the file name changes
   // - also allows for cancel button
   QCoreApplication::instance()->processEvents();
   qDebug() << "Indexing \n\n\n\n" << filePath <<"\n\n\n";
@@ -1056,6 +1056,148 @@ void ctkDICOMBrowser::exportSelectedSeries(QString dirPath, QStringList uids)
       }
     d->ExportProgress->setValue(numFiles);
     }
+}
+//----------------------------------------------------------------------------
+void ctkDICOMBrowser::exportToRaydose(QString dirPath, QStringList uids)
+{
+  Q_D(ctkDICOMBrowser)
+  
+  foreach (const QString& uid, uids)
+    {
+    QStringList filesForSeries = d->DICOMDatabase->filesForSeries(uid);
+
+    // Use the first file to get the overall series information
+    QString firstFilePath = filesForSeries[0];
+    QHash<QString,QString> descriptions (d->DICOMDatabase->descriptionsForFile(firstFilePath));
+    QString patientName = descriptions["PatientsName"];
+    QString patientIDTag = QString("0010,0020");
+    QString patientID = d->DICOMDatabase->fileValue(firstFilePath, patientIDTag);
+    QString studyDescription = descriptions["StudyDescription"];
+    QString seriesDescription = descriptions["SeriesDescription"];
+    QString studyDateTag = QString("0008,0020");
+    QString studyDate = d->DICOMDatabase->fileValue(firstFilePath,studyDateTag);
+    QString seriesNumberTag = QString("0020,0011");
+    QString seriesNumber = d->DICOMDatabase->fileValue(firstFilePath,seriesNumberTag);
+
+    QString sep = "/";
+    QString nameSep = "-";
+    QString destinationDir = dirPath + sep + patientID;
+    if (!patientName.isEmpty())
+      {
+      destinationDir += nameSep + patientName;
+      }
+    destinationDir += sep + studyDate;
+    if (!studyDescription.isEmpty())
+      {
+      destinationDir += nameSep + studyDescription;
+      }
+    destinationDir += sep + seriesNumber;
+    if (!seriesDescription.isEmpty())
+      {
+      destinationDir += nameSep + seriesDescription;
+      }
+    destinationDir += sep;
+
+    // make sure only ascii characters are in the directory path
+    destinationDir = destinationDir.toLatin1();
+    // replace any question marks that were used as replacements for non ascii
+    // characters with underscore
+    destinationDir.replace("?", "_");
+
+    // create the destination directory if necessary
+    if (!QDir().exists(destinationDir))
+      {
+      if (!QDir().mkpath(destinationDir))
+        {
+        QString errorString =
+          QString("Unable to create export destination directory:\n\n")
+          + destinationDir
+          + QString("\n\nHalting export.");
+        ctkMessageBox createDirectoryErrorMessageBox;
+        createDirectoryErrorMessageBox.setText(errorString);
+        createDirectoryErrorMessageBox.setIcon(QMessageBox::Warning);
+        createDirectoryErrorMessageBox.exec();
+        return;
+        }
+      }
+
+    // show progress
+    if (d->ExportProgress == 0)
+      {
+      d->ExportProgress = new QProgressDialog(this->tr("DICOM Export"), "Close", 0, 100, this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+      d->ExportProgress->setWindowModality(Qt::ApplicationModal);
+      d->ExportProgress->setMinimumDuration(0);
+      }
+    QLabel *exportLabel = new QLabel(this->tr("Exporting series ") + seriesNumber);
+    d->ExportProgress->setLabel(exportLabel);
+    d->ExportProgress->setValue(0);
+
+    int fileNumber = 0;
+    int numFiles = filesForSeries.size();
+    d->ExportProgress->setMaximum(numFiles);
+    foreach (const QString& filePath, filesForSeries)
+      {
+      QString destinationFileName = destinationDir;
+
+      QString fileNumberString;
+      // sequentially number the files
+      fileNumberString.sprintf("%06d", fileNumber);
+
+      destinationFileName += fileNumberString + QString(".dcm");
+
+      // replace non ASCII characters
+      destinationFileName = destinationFileName.toLatin1();
+      // replace any question marks that were used as replacements for non ascii
+      // characters with underscore
+      destinationFileName.replace("?", "_");
+
+      if (!QFile::exists(filePath))
+        {
+        d->ExportProgress->setValue(numFiles);
+        QString errorString = QString("Export source file not found:\n\n")
+          + filePath
+          + QString("\n\nHalting export.\n\nError may be fixed via Repair.");
+        ctkMessageBox copyErrorMessageBox;
+        copyErrorMessageBox.setText(errorString);
+        copyErrorMessageBox.setIcon(QMessageBox::Warning);
+        copyErrorMessageBox.exec();
+        return;
+      }
+      if (QFile::exists(destinationFileName))
+        {
+        d->ExportProgress->setValue(numFiles);
+        QString errorString = QString("Export destination file already exists:\n\n")
+          + destinationFileName
+          + QString("\n\nHalting export.");
+        ctkMessageBox copyErrorMessageBox;
+        copyErrorMessageBox.setText(errorString);
+        copyErrorMessageBox.setIcon(QMessageBox::Warning);
+        copyErrorMessageBox.exec();
+        return;
+        }
+
+      bool copyResult = QFile::copy(filePath, destinationFileName);
+      if (!copyResult)
+        {
+        d->ExportProgress->setValue(numFiles);
+        QString errorString = QString("Failed to copy\n\n")
+          + filePath
+          + QString("\n\nto\n\n")
+          + destinationFileName
+          + QString("\n\nHalting export.");
+        ctkMessageBox copyErrorMessageBox;
+        copyErrorMessageBox.setText(errorString);
+        copyErrorMessageBox.setIcon(QMessageBox::Warning);
+        copyErrorMessageBox.exec();
+        return;
+        }
+
+      fileNumber++;
+      d->ExportProgress->setValue(fileNumber);
+      }
+    d->ExportProgress->setValue(numFiles);
+    }
+  
 }
 
 //----------------------------------------------------------------------------

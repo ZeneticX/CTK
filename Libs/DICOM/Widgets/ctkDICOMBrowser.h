@@ -137,6 +137,8 @@ protected Q_SLOTS:
     /// Called to export the series associated with the selected UIDs
     /// \sa exportSelectedStudies, exportSelectedPatients
     void exportSelectedSeries(QString dirPath, QStringList uids);
+    /// Call to export selected series to Raydose
+    void exportToRaydose(QString dirPath, QStringList uids);
     /// Called to export the studies associated with the selected UIDs
     /// \sa exportSelectedSeries, exportSelectedPatients
     void exportSelectedStudies(QString dirPath, QStringList uids);

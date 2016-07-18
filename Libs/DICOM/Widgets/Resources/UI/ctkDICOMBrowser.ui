@@ -46,6 +46,7 @@
      <addaction name="ActionSend"/>
      <addaction name="ActionRemove"/>
      <addaction name="ActionRepair"/>
+     <addaction name="ActionRaydose"/>
     </widget>
    </item>
    <item>

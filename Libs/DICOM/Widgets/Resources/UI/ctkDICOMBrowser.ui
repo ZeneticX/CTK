@@ -326,6 +326,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>ActionRaydose</sender>
+   <signal>triggered()</signal>
+   <receiver>ctkDICOMBrowser</receiver>
+   <slot>exportToRaydose(QString dirPath, QStringList uids)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>303</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>openImportDialog()</slot>
@@ -341,5 +357,6 @@
   <slot>onAutoPlayCheckboxStateChanged(int)</slot>
   <slot>onThumbnailWidthSliderValueChanged(int)</slot>
   <slot>onRemoveAction()</slot>
+  <slot>exportToRaydose(QString dirPath, QStringList uids)</slot>
  </slots>
 </ui>

@@ -1060,7 +1060,7 @@ void ctkDICOMBrowser::exportSelectedSeries(QString dirPath, QStringList uids)
 //----------------------------------------------------------------------------
 void ctkDICOMBrowser::exportToRaydose(QString dirPath, QStringList uids)
 {
-  Q_D(ctkDICOMBrowser)
+  Q_D(ctkDICOMBrowser);
   
   foreach (const QString& uid, uids)
     {

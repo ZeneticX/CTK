@@ -330,7 +330,7 @@
    <sender>ActionRaydose</sender>
    <signal>triggered()</signal>
    <receiver>ctkDICOMBrowser</receiver>
-   <slot>exportToRaydose(QString dirPath, QStringList uids)</slot>
+   <slot>exportToRaydose()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -357,6 +357,6 @@
   <slot>onAutoPlayCheckboxStateChanged(int)</slot>
   <slot>onThumbnailWidthSliderValueChanged(int)</slot>
   <slot>onRemoveAction()</slot>
-  <slot>exportToRaydose(QString dirPath, QStringList uids)</slot>
+  <slot>exportToRaydose()</slot>
  </slots>
 </ui>

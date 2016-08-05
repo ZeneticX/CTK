@@ -1083,7 +1083,7 @@ void ctkDICOMBrowser::exportToRaydose()
       this->exportSelectedSeries(dirPath, selectedSeriesUIDs);
       }
     delete directoryDialog;
-    }
+    
 }
 
 //----------------------------------------------------------------------------

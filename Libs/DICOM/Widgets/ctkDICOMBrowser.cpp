@@ -915,6 +915,33 @@ void ctkDICOMBrowser::onSeriesRightClicked(const QPoint &point)
     delete directoryDialog;
     }
 }
+//------------------------------------------------------------------------------
+void ctkDICOMBrowser::exportToRaydose()
+{
+  Q_D(ctkDICOMBrowser);
+  
+  // get the list of series that are selected
+  QStringList selectedSeriesUIDs = d->dicomTableManager->currentSeriesSelection();
+  int numSeries = selectedSeriesUIDs.size();
+  if (numSeries == 0)
+    {
+    qDebug() << "No series selected!";
+    return;
+    }
+    
+  ctkFileDialog* directoryDialog = new ctkFileDialog();
+  directoryDialog->setOption(QFileDialog::DontUseNativeDialog);
+  directoryDialog->setOption(QFileDialog::ShowDirsOnly);
+  directoryDialog->setFileMode(QFileDialog::DirectoryOnly);
+  bool res = directoryDialog->exec();
+  if (res)
+    {
+    QStringList dirs = directoryDialog->selectedFiles();
+    QString dirPath = dirs[0];
+    this->exportSelectedSeries(dirPath, selectedSeriesUIDs);
+    }
+  delete directoryDialog;
+}
 
 //----------------------------------------------------------------------------
 void ctkDICOMBrowser::exportSelectedSeries(QString dirPath, QStringList uids)
@@ -1057,35 +1084,6 @@ void ctkDICOMBrowser::exportSelectedSeries(QString dirPath, QStringList uids)
     d->ExportProgress->setValue(numFiles);
     }
 }
-//----------------------------------------------------------------------------
-void ctkDICOMBrowser::exportToRaydose()
-{
-  Q_D(ctkDICOMBrowser);
-  
-  // get the list of series that are selected
-  QStringList selectedSeriesUIDs = d->dicomTableManager->currentSeriesSelection();
-  int numSeries = selectedSeriesUIDs.size();
-  if (numSeries == 0)
-    {
-    qDebug() << "No series selected!";
-    return;
-    }
-    
-    ctkFileDialog* directoryDialog = new ctkFileDialog();
-    directoryDialog->setOption(QFileDialog::DontUseNativeDialog);
-    directoryDialog->setOption(QFileDialog::ShowDirsOnly);
-    directoryDialog->setFileMode(QFileDialog::DirectoryOnly);
-    bool res = directoryDialog->exec();
-    if (res)
-      {
-      QStringList dirs = directoryDialog->selectedFiles();
-      QString dirPath = dirs[0];
-      this->exportSelectedSeries(dirPath, selectedSeriesUIDs);
-      }
-    delete directoryDialog;
-    
-}
-
 //----------------------------------------------------------------------------
 void ctkDICOMBrowser::exportSelectedStudies(QString dirPath, QStringList uids)
 {

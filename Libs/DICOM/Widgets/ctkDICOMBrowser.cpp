@@ -967,16 +967,7 @@ void ctkDICOMBrowser::exportSelectedSeries(QString dirPath, QStringList uids)
 
     QString sep = "/";
     QString nameSep = "-";
-    QString destinationDir = dirPath + sep + patientID;
-    if (!patientName.isEmpty())
-      {
-      destinationDir += nameSep + patientName;
-      }
-    destinationDir += sep + studyDate;
-    if (!studyDescription.isEmpty())
-      {
-      destinationDir += nameSep + studyDescription;
-      }
+    QString destinationDir = dirPath + sep + "Input";
     destinationDir += sep + seriesNumber;
     if (!seriesDescription.isEmpty())
       {
